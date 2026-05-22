@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Favicon Converter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #f8fafc;
+    --border: #334155;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    font-family: 'Segoe UI', sans-serif;
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 900px;
+}
+
+@media(min-width: 768px) {
+    .container {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    position: relative;
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h2 { margin: 0; font-size: 1.4rem; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+h3 { margin: 20px 0 10px 0; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+
+.mode-toggle {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+.mode-toggle:hover { background: var(--primary); border-color: var(--primary); }
+
+.input-section { margin-bottom: 20px; min-height: 140px; }
+
+.upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+    background: rgba(255,255,255,0.02);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 140px;
+}
+.upload-area:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); }
+.upload-area i { font-size: 30px; color: #94a3b8; margin-bottom: 10px; }
+.upload-area p { margin: 0; font-size: 13px; color: #cbd5e1; }
+#upload { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
+.emoji-area {
+    display: none;
+    text-align: center;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.emoji-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-size: 70px;
+    text-align: center;
+    color: white;
+    outline: none;
+    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+    line-height: 1.2;
+    padding: 0;
+    margin: 0;
+}
+.emoji-input::placeholder { font-size: 20px; color: #475569; font-family: 'Segoe UI', sans-serif; opacity: 0.5; vertical-align: middle;}
+
+label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #cbd5e1; }
+
+.control-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    background: #020617;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+input[type="color"] {
+    -webkit-appearance: none; border: none; width: 35px; height: 35px; border-radius: 50%; background: none; cursor: pointer;
+}
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; border: 1px solid #fff; }
+
+.checkbox-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
+
+.slider-group {
+    background: #020617;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 15px;
+}
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.slider-row:last-child { margin-bottom: 0; }
+.slider-row label { width: 60px; margin: 0; font-size: 12px; color: #94a3b8; }
+.slider { flex-grow: 1; height: 5px; accent-color: var(--primary); cursor: pointer; }
+.reset-btn {
+    background: none; border: 1px solid var(--border); color: #94a3b8; 
+    border-radius: 5px; font-size: 11px; padding: 2px 8px; cursor: pointer;
+}
+.reset-btn:hover { color: white; border-color: white; }
+
+.preview-box { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.preview-canvas-container {
+    width: 140px; height: 140px;
+    background: repeating-conic-gradient(#334155 0% 25%, #1e293b 0% 50%) 50% / 20px 20px;
+    border-radius: 16px; padding: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+canvas { width: 100%; height: 100%; object-fit: contain; }
+
+.browser-mockup { width: 100%; background: #0f172a; border-radius: 8px 8px 0 0; overflow: hidden; margin-top: 10px; border: 1px solid var(--border); }
+.browser-header { background: #1e293b; padding: 8px; display: flex; gap: 6px; align-items: center; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #475569; }
+.dot.red { background: #ef4444; } .dot.yellow { background: #eab308; } .dot.green { background: #22c55e; }
+.browser-tab { background: #334155; padding: 6px 15px; border-radius: 6px 6px 0 0; font-size: 12px; display: flex; align-items: center; gap: 8px; width: fit-content; margin-left: 10px; margin-top: 4px; }
+.mini-favicon { width: 16px; height: 16px; }
+
+.btn-generate {
+    width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--primary); color: white; font-weight: bold; font-size: 16px;
+    cursor: pointer; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s;
+}
+.btn-generate:hover { background: var(--primary-hover); transform: translateY(-2px); }
+.btn-generate:disabled { background: #475569; cursor: not-allowed; opacity: 0.7; transform: none; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header-row">
+            <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Favicon Converter</h2>
+            <button class="mode-toggle" id="modeBtn" title="Switch to Emoji Mode" onclick="toggleInputMode()">
+                <i class="fa-regular fa-face-smile"></i>
+            </button>
+        </div>
+        
+        <div class="input-section">
+            <div class="upload-area" id="imageUploadBox">
+                <input type="file" id="upload" accept="image/*">
+                <i class="fa-solid fa-cloud-arrow-up" id="uploadIcon"></i>
+                <p id="uploadText">Click or Drag Image Here</p>
+            </div>
+            <div class="emoji-area" id="emojiInputBox" style="display:none;">
+                <input type="text" id="emojiInput" class="emoji-input" placeholder="Type Emoji..." maxlength="2">
+                <p style="font-size:11px; color:#94a3b8; margin-top:10px">Win: <kbd>Win</kbd>+<kbd>.</kbd> | Mac: <kbd>Cmd</kbd>+<kbd>Ctrl</kbd>+<kbd>Space</kbd></p>
+            </div>
+        </div>
+
+        <h3>Styles</h3>
+        <label>Background Color</label>
+        <div class="control-row">
+            <input type="color" id="bgcolor" value="#ffffff">
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="transparentBg">
+                <label for="transparentBg" style="font-size:13px; margin:0">Transparent</label>
+            </div>
+        </div>
+
+        <div class="control-row" onclick="toggleRounded()">
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="rounded">
+                <label for="rounded" style="margin:0">Rounded</label>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Adjust Position</h3>
+            <button class="reset-btn" onclick="resetControls()">Reset</button>
+        </div>
+        
+        <div class="slider-group">
+            <div class="slider-row">
+                <label>Size</label>
+                <input type="range" class="slider" id="scale" min="0.1" max="2.0" step="0.05" value="1.0">
+            </div>
+            <div class="slider-row">
+                <label>Move X</label>
+                <input type="range" class="slider" id="panX" min="-100" max="100" value="0">
+            </div>
+            <div class="slider-row">
+                <label>Move Y</label>
+                <input type="range" class="slider" id="panY" min="-100" max="100" value="0">
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card preview-box">
+        <h2><i class="fa-solid fa-eye"></i> Live Preview</h2>
+        
+        <div class="preview-canvas-container">
+            <canvas id="previewCanvas" width="512" height="512"></canvas>
+        </div>
+
+        <div style="width:100%; text-align:left;">
+            <label style="font-weight:normal; font-size:12px; margin-bottom:5px;">Browser Tab:</label>
+            <div class="browser-mockup">
+                <div class="browser-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="browser-tab">
+                        <canvas id="miniCanvas" width="32" height="32" class="mini-favicon"></canvas>
+                        <span>My Website</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-generate" onclick="generateZip()" id="genBtn" disabled>
+            <i class="fa-solid fa-download"></i> Download .ZIP
+        </button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<script>
+const els = {
+    modeBtn: document.getElementById("modeBtn"),
+    imageBox: document.getElementById("imageUploadBox"),
+    emojiBox: document.getElementById("emojiInputBox"),
+    upload: document.getElementById("upload"),
+    emojiInput: document.getElementById("emojiInput"),
+    scale: document.getElementById("scale"),
+    panX: document.getElementById("panX"),
+    panY: document.getElementById("panY"),
+    fillColor: document.getElementById("bgcolor"),
+    transparentBg: document.getElementById("transparentBg"),
+    rounded: document.getElementById("rounded"),
+    canvas: document.getElementById("previewCanvas"),
+    miniCanvas: document.getElementById("miniCanvas"),
+    genBtn: document.getElementById("genBtn"),
+    uploadText: document.getElementById("uploadText"),
+    uploadIcon: document.getElementById("uploadIcon")
+};
+
+const ctx = els.canvas.getContext("2d");
+const miniCtx = els.miniCanvas.getContext("2d");
+
+let processedImage = null;
+let currentMode = 'image';
+
+function toggleInputMode() {
+    if(currentMode === 'image') {
+        currentMode = 'emoji';
+        els.imageBox.style.display = 'none';
+        els.emojiBox.style.display = 'flex';
+        els.modeBtn.innerHTML = '<i class="fa-regular fa-image"></i>';
+        els.modeBtn.title = "Switch to Image Upload";
+        els.emojiInput.focus();
+    } else {
+        currentMode = 'image';
+        els.emojiBox.style.display = 'none';
+        els.imageBox.style.display = 'flex';
+        els.modeBtn.innerHTML = '<i class="fa-regular fa-face-smile"></i>';
+        els.modeBtn.title = "Switch to Emoji Input";
+    }
+}
+
+els.upload.addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    els.uploadText.textContent = file.name;
+    els.uploadIcon.className = "fa-solid fa-check";
+    els.uploadIcon.style.color = "#22c55e";
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        updateImageSource(event.target.result);
+    }
+    reader.readAsDataURL(file);
+});
+
+els.emojiInput.addEventListener("input", function(e) {
+    const char = e.target.value;
+    if(!char) return;
+    
+    const size = 512;
+    const tempC = document.createElement('canvas');
+    tempC.width = size;
+    tempC.height = size;
+    const tCtx = tempC.getContext('2d');
+    
+    tCtx.clearRect(0, 0, size, size);
+    tCtx.font = `${size * 0.75}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
+    tCtx.textAlign = 'center';
+    tCtx.textBaseline = 'middle';
+    tCtx.fillText(char, size/2, size/2); 
+    
+    updateImageSource(tempC.toDataURL());
+});
+
+function updateImageSource(src) {
+    processedImage = new Image();
+    processedImage.onload = function() {
+        els.genBtn.removeAttribute("disabled");
+        drawPreview();
+    };
+    processedImage.src = src;
+}
+
+[els.scale, els.panX, els.panY, els.fillColor, els.transparentBg].forEach(el => {
+    el.addEventListener("input", () => requestAnimationFrame(drawPreview));
+});
+
+function toggleRounded() {
+    if(event.target !== els.rounded) els.rounded.checked = !els.rounded.checked;
+    requestAnimationFrame(drawPreview);
+}
+els.rounded.addEventListener("change", () => requestAnimationFrame(drawPreview));
+
+function resetControls() {
+    els.scale.value = 1.0;
+    els.panX.value = 0;
+    els.panY.value = 0;
+    drawPreview();
+}
+
+function drawPreview() {
+    if(!processedImage) return;
+    renderToCanvas(ctx, els.canvas.width);
+    renderToCanvas(miniCtx, els.miniCanvas.width);
+}
+
+function renderToCanvas(context, size) {
+    context.clearRect(0, 0, size, size);
+
+    const isTransparent = els.transparentBg.checked;
+    const isRounded = els.rounded.checked;
+    
+    if(!isTransparent) {
+        context.fillStyle = els.fillColor.value;
+        if(isRounded) {
+            context.beginPath();
+            context.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+            context.fill();
+        } else {
+            context.fillRect(0, 0, size, size);
+        }
+    }
+
+    context.save();
+    
+    if(isRounded) {
+        context.beginPath();
+        context.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+        context.closePath();
+        context.clip();
+    }
+
+    const zoom = parseFloat(els.scale.value);
+    const panX = parseFloat(els.panX.value) * (size / 100);
+    const panY = parseFloat(els.panY.value) * (size / 100);
+
+    const imgSize = Math.min(size / processedImage.width, size / processedImage.height);
+    const w = processedImage.width * imgSize * zoom;
+    const h = processedImage.height * imgSize * zoom;
+    
+    const x = (size/2) + panX - (w/2);
+    const y = (size/2) + panY - (h/2);
+
+    context.drawImage(processedImage, x, y, w, h);
+    
+    context.restore();
+}
+
+const sizes = [16, 32, 48, 64, 180, 192, 512];
+
+function generateZip() {
+    if(!processedImage) return;
+    els.genBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+    
+    const zip = new JSZip();
+    let processed = 0;
+
+    sizes.forEach(s => {
+        const canvas = document.createElement("canvas");
+        canvas.width = s;
+        canvas.height = s;
+        const tCtx = canvas.getContext("2d");
+        
+        renderToCanvas(tCtx, s); 
+
+        canvas.toBlob(blob => {
+            let name;
+            if (s === 180) name = "apple-touch-icon.png";
+            else name = `favicon-${s}x${s}.png`;
+            zip.file(name, blob);
+            
+            if (s === 32) zip.file("favicon.ico", blob);
+
+            processed++;
+            if(processed === sizes.length) finalizeZip(zip);
+        }, "image/png");
+    });
+}
+
+function finalizeZip(zip) {
+    const htmlCode = `
+<!-- Favicon Links -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+    `;
+    zip.file("code-snippet.html", htmlCode);
+    
+    zip.generateAsync({type:"blob"}).then(content => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(content);
+        a.download = "favicon.zip";
+        a.click();
+        els.genBtn.innerHTML = '<i class="fa-solid fa-check"></i> Downloaded!';
+        setTimeout(() => els.genBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download .ZIP', 3000);
+    });
+}
+</script>
+
+</body>
+</html>
